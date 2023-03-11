@@ -1,0 +1,212 @@
+
+[
+  {
+    "name": "Коризна вязаная (круглое дно)",
+    "format": "ВЫСОТАхДИАМЕТР",
+    "type": "Простая",
+    "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
+    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
+    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "sizes": [
+      {
+        "height": 16,
+        "diameter": 9
+      },
+      {
+        "height": 14,
+        "diameter": 8
+      },
+      {
+        "height": 12,
+        "diameter": 9
+      },
+      {
+        "height": 11,
+        "diameter": 7
+      }
+    ],
+    "resizable": true,
+    "specifics": [
+      {
+        "name": "Крышка",
+        "dependsOfSize": {
+          "min": 8,
+          "max": 20,
+          "type": "diameter"
+        }
+      },
+      {
+        "name": "Ручки вязаные",
+        "dependsOfSize": {
+          "min": 20,
+          "type": "diameter"
+        }
+      },
+      {
+        "name": "Ручки кожанные",
+        "dependsOfSize": {
+          "min": 20,
+          "type": "diameter"
+        }
+      }
+    ],
+    "min-cost": 0
+  },
+  {
+    "name": "Коризна вязаная (круглое дно)",
+    "format": "ВЫСОТАхДИАМЕТР",
+    "type": "Деревянное дно",
+    "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
+    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
+    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "sizes": [
+      {
+        "height": 10
+      },
+      {
+        "height": 15
+      },
+      {
+        "height": 25
+      },
+      {
+        "height": 30
+      }
+    ],
+    "resizable": true,
+    "hasConstantSizes": true,
+    "specifics": [
+      {
+        "name": "Крышка",
+        "dependsOfSize": {
+          "min": 8,
+          "max": 20,
+          "type": "diameter"
+        }
+      },
+      {
+        "name": "Ручки вязаные",
+        "dependsOfSize": {
+          "min": 20,
+          "type": "diameter"
+        }
+      },
+      {
+        "name": "Ручки кожанные",
+        "dependsOfSize": {
+          "min": 20,
+          "type": "diameter"
+        }
+      }
+    ],
+    "min-cost": 0
+  },
+  {
+    "name": "Коризна вязаная (Прямоугольное дно)",
+    "format": "ВЫСОТАхДЛИНАхШИРИНА",
+    "type": "Простая",
+    "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
+    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
+    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "sizes": [
+      {
+        "height": 9,
+        "length": 23,
+        "width": 16
+      }
+    ],
+    "resizable": true,
+    "min-cost": 0
+  },
+  {
+    "name": "Коризна вязаная (Прямоугольное дно)",
+    "format": "ВЫСОТАхДЛИНАхШИРИНА",
+    "type": "С деревянным дном",
+    "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
+    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
+    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "sizes": [
+      {
+        "height": 9,
+        "length": 23,
+        "width": 16
+      }
+    ],
+    "resizable": true,
+    "min-cost": 0
+  },
+    {
+      "name": "Корзина-ракушка",
+      "photo": "",
+      "palette": "",
+      "palettePhoto": "",
+      "sizes": [
+        {
+          "length": 30
+        },
+        {
+          "length": 22
+        }
+      ],
+      "min-cost": 0
+    },
+    {
+      "name": "Салфетница",
+      "photo": "",
+      "palette": "",
+      "palettePhoto": "",
+      "sizes": [
+        {
+          "height": 17,
+          "length": 25,
+          "width": 15
+        }
+      ],
+      "min-cost": 0
+    },
+    {
+      "name": "Сумка-шоппер",
+      "photo": "",
+      "palette": "",
+      "palettePhoto": "",
+      "sizes": [
+        {
+          "handles": 45, //?o?ee
+          "length": 30,
+          "width": 30
+        }
+      ],
+      "min-cost": 0
+    }
+]
+
+/*
+{
+      "name": "",
+      "type": "",
+      "photo": "",
+      "palette": "",
+      "palettePhoto": "",
+      "sizes": [
+        {
+          "height": 0,
+          "diameter": 
+        }
+      ],
+      "resizable": true,
+      "extraSizes": [ ],
+      "specifics": [
+        {
+          "name": "",
+          "dependsOfSize": {
+            "range": {
+              "min": ,
+              "max": 
+            },
+            "type": ""
+          }
+        }        
+      ],
+      "min-cost": 
+    },
+*/
