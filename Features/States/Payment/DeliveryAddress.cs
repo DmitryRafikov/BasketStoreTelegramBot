@@ -1,4 +1,5 @@
-﻿using BasketStoreTelegramBot.Features;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
 using BasketStoreTelegramBot.States.Payment;
@@ -27,6 +28,11 @@ namespace BasketStoreTelegramBot.States
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             var state = new PaymentState(_stateMachine);
             return await state.Initialize(data);
         }

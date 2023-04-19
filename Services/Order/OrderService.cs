@@ -1,4 +1,5 @@
 ﻿using BasketStoreTelegramBot.Entities;
+using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Models;
 using BasketStoreTelegramBot.Services.Product;
 using Microsoft.EntityFrameworkCore;
@@ -12,13 +13,12 @@ namespace BasketStoreTelegramBot.Services.Order
 {
     class OrderService : IOrderService
     {
-        private static readonly Lazy<OrderService> _orderService = new Lazy<OrderService>(() => new OrderService());
-        public static OrderService Instance { get { return _orderService.Value; } }
-        private DataContext _dataContext = DataContext.Instance;
+        private DataContext _dataContext;
+        public OrderService() {
+            _dataContext = new DataContext();
+        }
         public async Task AddOrderAsync(OrderEntity order)
         {
-            if (order.Id < _dataContext.Orders.Count())
-                order.Id = _dataContext.Orders.Count() + 1;
             await _dataContext.Orders.AddAsync(order);
             await _dataContext.SaveChangesAsync();
         }

@@ -1,4 +1,5 @@
 ﻿using BasketStoreTelegramBot.Entities;
+using BasketStoreTelegramBot.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,11 @@ namespace BasketStoreTelegramBot.Models
 {
     class DataContext : DbContext, IDisposable
     {
-        private static readonly Lazy<DataContext> _dataContext = new Lazy<DataContext>(() => new DataContext());
-        public static DataContext Instance { get { return _dataContext.Value; } }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<ProductEntity> Products { get; set; }
         public DbSet<OrderEntity> Orders { get; set; }
         public DbSet<AdminEntity> Admins { get; set; }
+        public DbSet<ShoppingBagProduct> ShopppingBagProducts { get; set; }
         public DbSet<CatalogProductEntity> CatalogProducts { get; set; }
         public string DbPath { get; }
 
@@ -27,6 +27,11 @@ namespace BasketStoreTelegramBot.Models
 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite(@"Data Source=C:\Users\vladu\source\repos\BasketStoreTelegramBot\BasketStoreTelegramDB.db");
+            => options.UseSqlite(@"Data Source=C:\Users\vladu\source\repos\BasketStoreTelegramBot\Data\BasketStoreTelegramDB.db");
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ShoppingBagProduct>().HasNoKey();
+            
+        }
     }
 }

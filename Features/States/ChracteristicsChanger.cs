@@ -1,7 +1,10 @@
-﻿using BasketStoreTelegramBot.Features;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
+using BasketStoreTelegramBot.Features.States.Constructor.Sizes;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,18 +13,14 @@ namespace BasketStoreTelegramBot.States
     class ChracteristicsChanger:IState
     {
         private readonly IStateMachine _stateMachine;
-        private static ProductData _currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                   CurrentProductInfo(ShoppingBag.Instance.CurrentProduct.Name,
-                                                        ShoppingBag.Instance.CurrentProduct.BottomType);
-
-        private readonly List<string> _buttons = DefineButtons();
-
+        private ShoppingBag _shoppingBag;
+        private ProductData _currentProductInfo;
         public StateTypes StateType => StateTypes.CharacteristicsChanger;
 
-        private static List<string> DefineButtons()
+        private List<string> DefineButtons(MessageEvent data)
         {
             List<string> buttons = new();
-            var product = ShoppingBag.Instance.CurrentProduct;
+            var product = _shoppingBag.CurrentProduct(Convert.ToInt32(data.Id));
             buttons.Add("Изменить цвет");
             if (_currentProductInfo.Resizable.Value)
             {
@@ -38,13 +37,18 @@ namespace BasketStoreTelegramBot.States
         public ChracteristicsChanger(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
+            _currentProductInfo = ProductDataJsonDeserializer.Instance.
+                                   CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
+                                                        _shoppingBag.CurrentProduct(chatID).BottomType);
             var keyboard = new Markup
             {
-                KeyboardWithText = _buttons
+                KeyboardWithText = DefineButtons(data)
             };
             return new TextMessage
             {
@@ -55,8 +59,13 @@ namespace BasketStoreTelegramBot.States
 
         public async Task<IMessage> Update(MessageEvent data)
         {
-            var text = data.Message.ToLower();
-            if (_buttons.Contains(data.Message)) {
+            int chatID = Convert.ToInt32(data.Id);
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
+            if (DefineButtons(data).Contains(data.Message)) {
                 IState state = null;
                 if (data.Message == "Изменить цвет")
                 {
@@ -64,7 +73,7 @@ namespace BasketStoreTelegramBot.States
                 }
                 if (data.Message == "Изменить размер")
                 {
-                    state = new SizeSelector(_stateMachine, this);
+                    state = new ChooseSizeType(_stateMachine, this);
                 }
                 if (data.Message == "Изменить особенности")
                 {
@@ -74,6 +83,7 @@ namespace BasketStoreTelegramBot.States
                 {
                     state = new ConstructorEnd(_stateMachine);
                 }
+                _shoppingBag.AddProductInBag(chatID);
                 _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);
             }

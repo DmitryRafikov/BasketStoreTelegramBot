@@ -1,29 +1,24 @@
-﻿using BasketStoreTelegramBot.Entities;
-using BasketStoreTelegramBot.Features;
-using BasketStoreTelegramBot.Features.ProductInformation;
+﻿using BasketStoreTelegramBot.Features.ProductInformation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BasketStoreTelegramBot.Others
 {
-    class ProductExtension
+    class CostCalculator
     {
-        public BasketsGeometryTypes GeometryType { get; set; }
-        public static SizeContainer Size { get; set; }
-        public static string ToString(ProductEntity product)
-        {
-            return product.Name +
-                "\nЦвет: " + product.Color +
-                "\n" + Size.ToString() +
-                "\nОсобенности: " + product.Specifics +
-                "\nИтоговая стоимость товара: " + product.Cost;
+        public static int CalculateCost(int minCost, ISizeContainer sizes)
+        { 
+            if(sizes.Diameter.HasValue)
+                return (int)CalculateCircleArea(sizes.Height.Value, sizes.Diameter.Value)*minCost;
+            return (int)CalculateSquareArea(sizes.Height.Value, sizes.Width.Value, sizes.Length.Value)*minCost;
         }
-        public static int CalculateCost(ProductEntity product)
+        private static double CalculateSquareArea(int heigth, int width, int length)
         {
-            return 0;
+            return heigth * width * length;
+        }
+        private static double CalculateCircleArea(int height, int diameter) 
+        {
+            double radius = diameter / 2;
+            return Math.PI* radius* (radius+height);
         }
     }
 }

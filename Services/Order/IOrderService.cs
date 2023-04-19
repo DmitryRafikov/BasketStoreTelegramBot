@@ -1,4 +1,5 @@
 ﻿using BasketStoreTelegramBot.Entities;
+using BasketStoreTelegramBot.Entities.Products;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,5 @@
-﻿using BasketStoreTelegramBot.Entities;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
@@ -12,41 +13,49 @@ namespace BasketStoreTelegramBot.States
     class ShoppingBagState : IState
     {
         IStateMachine _stateMachine;
-        private static ProductData _currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                   CurrentProductInfo(ShoppingBag.Instance.CurrentProduct.Name,
-                                                        ShoppingBag.Instance.CurrentProduct.BottomType);
-        private readonly List<string> _buttons = new List<string>() {
-            "Изменить",
-            "Удалить"
-        };
+        private ShoppingBag _shoppingBag;
         public StateTypes StateType => StateTypes.ShoppingBagState;
         public ShoppingBagState(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
-            return new PhotoMessagesCollection() {
-                Collection = CreatePhotoMessagesCollection()
-            };
-
+            int chatID = Convert.ToInt32(data.Id);
+            List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
+            if (products.Count != 0)
+                return new PhotoMessagesCollection()
+                {
+                    Collection = CreatePhotoMessagesCollection(chatID)
+                };
+            else
+                return new TextMessage
+                {
+                    Text = "В корзине пока нет товаров!"
+                };
         }
         public async Task<IMessage> Update(MessageEvent data)
         {
+            
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             if (data.Callback != null)
             {
                 if (data.Callback.Message.Text.ToLower() == "удалить")
                 {
-                    ShoppingBag.Instance.RemoveProductByIndex(Convert.ToInt32(data.Callback.Data));
+                    int chatID = Convert.ToInt32(data.Id);
+                    List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
+                    var productToRemove = products[Convert.ToInt32(data.Callback.Data)];
+                    _shoppingBag.RemoveProduct(chatID, productToRemove);
                     return new TextMessage()
                     {
                         Text = "Выбранный товар удален из списка товаров"
                     };
-                }
-                if (data.Callback.Message.Text.ToLower() == "изменить")
-                {
-                    ShoppingBag.Instance.RemoveProductByIndex(Convert.ToInt32(data.Callback.Data));
                 }
                 return new TextMessage()
                 {
@@ -57,6 +66,7 @@ namespace BasketStoreTelegramBot.States
             if (data.Message.ToLower() == "оформить заказ")
             {
                 var state = new DeliveryAddress(_stateMachine);
+                _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);
             }
             return new TextMessage()
@@ -64,19 +74,19 @@ namespace BasketStoreTelegramBot.States
                 Text = "Действие не опознано"
             };
         }
-        private List<PhotoMessage> CreatePhotoMessagesCollection() {
+        private List<PhotoMessage> CreatePhotoMessagesCollection(int chatID) {
             var list = new List<PhotoMessage>();
-            foreach (var item in ShoppingBag.Instance.Products) {
+            List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
+            foreach (var item in products) {
                 var keyboard = new Markup
                 {
-                    KeyboardWithCallBack = GetItemActionsCollection(ShoppingBag.Instance.Products.IndexOf(item))
+                    KeyboardWithCallBack = GetItemActionsCollection(products.IndexOf(item))
                 };
                 var message = new PhotoMessage()
                 {
-                    Link = ProductDataJsonDeserializer.Instance.
-                                   CurrentProductInfo(item.Name, item.BottomType).Photo,
+                    Link = item.PhotoLink,
                     Caption = item.ToString(),
-                    ReplyMarkup = keyboard.Insert()
+                    ReplyMarkup = keyboard.Insert(true)
                 };
                 list.Add(message);
             }
@@ -85,7 +95,6 @@ namespace BasketStoreTelegramBot.States
         private Dictionary<string, string> GetItemActionsCollection(int itemNumber)
         {
             return new Dictionary<string, string>() {
-                { "Изменить", itemNumber.ToString()},
                 { "Удалить", itemNumber.ToString()}
             };
         }

@@ -9,8 +9,7 @@ namespace BasketStoreTelegramBot.MessagesHandle
 {
     class PhotoMessagesCollection : IMessage
     {
-        public List<PhotoMessage> Collection ;
-        public IReplyMarkup ReplyMarkup = new ReplyKeyboardRemove();
+        public List<PhotoMessage> Collection;
         
         public async Task SendAsync(Chat chat, TelegramBotClient bot)
         {
@@ -28,7 +27,7 @@ namespace BasketStoreTelegramBot.MessagesHandle
             };
             var message = new TextMessage()
             {
-                Text = string.Empty,
+                Text = "Показаны все товары",
                 ReplyMarkup = keyboard.Insert()
             };
             await message.SendAsync(chat, bot);

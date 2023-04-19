@@ -10,7 +10,7 @@ namespace BasketStoreTelegramBot
     {
         private static readonly Lazy<MessagesFactory> _orderService = new Lazy<MessagesFactory>(() => new MessagesFactory());
         public static MessagesFactory Instance { get => _orderService.Value; } 
-        public TelegramBotClient Bot { get => new TelegramBotClient("5846422307:AAFe--2RJpGiSwQQOEO3KxaxkyQUdIxUMgE"); }
+        public TelegramBotClient Bot { get => new TelegramBotClient("5846422307:AAGgssW9osAbTUgUWRVcRQPoxHKmj6dc9XA"); }
         private MessagesFactory() 
         {
         }
@@ -20,7 +20,7 @@ namespace BasketStoreTelegramBot
         }
         public async Task Notify(ChatId id, INotifyMessage message)
         {
-            await message.SendAsync(id, Bot);
+            await message.NotifyAsync(id, Bot);
         }
     }
 }

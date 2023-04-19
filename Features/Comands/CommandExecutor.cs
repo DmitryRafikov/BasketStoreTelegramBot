@@ -1,4 +1,6 @@
 ﻿using BasketStoreTelegramBot.Features;
+using BasketStoreTelegramBot.Features.States;
+using BasketStoreTelegramBot.Features.States.Admin;
 using BasketStoreTelegramBot.StateMachines;
 using BasketStoreTelegramBot.States;
 using System;
@@ -23,10 +25,12 @@ namespace BasketStoreTelegramBot.Comands
                     return GetState(_stateMachine, new ProductTypeSelector(_stateMachine), data);
                 case (CommandsList.ShowDelayed):
                     return GetState(_stateMachine, new ShoppingBagState(_stateMachine), data);
+                case (CommandsList.CatalogCommand):
+                    return GetState(_stateMachine, new CatalogState(_stateMachine), data);
                 case (CommandsList.ShowDeliveryInfo):
                     return GetState(_stateMachine, new InitState(_stateMachine), data);
                 case (CommandsList.ChangeToAdmin):
-                    return GetState(_stateMachine, new InitState(_stateMachine), data);
+                    return GetState(_stateMachine, new AdminInitState(_stateMachine, new InitState(_stateMachine)), data);
                 default:throw new ArgumentException();
             }
         }

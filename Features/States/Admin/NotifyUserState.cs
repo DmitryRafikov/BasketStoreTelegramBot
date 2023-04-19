@@ -1,4 +1,5 @@
-﻿using BasketStoreTelegramBot.Entities;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Entities;
 using BasketStoreTelegramBot.Features.Messages;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.Services.Order;
@@ -14,13 +15,14 @@ namespace BasketStoreTelegramBot.Features.States.Admin
     {
         public StateTypes StateType => StateTypes.UserNotificationState;
         private IStateMachine _stateMachine;
-        private IOrderService _orderService = OrderService.Instance;
+        private IOrderService _orderService;
         private UserNotifyer _userNotifyer;
         private List<string> _buttons;
         public UserNotificationState(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
             _userNotifyer = new UserNotifyer();
+            _orderService = new OrderService();
             _buttons = new List<string>() { 
             "Вернуться назад"
             };
@@ -36,6 +38,11 @@ namespace BasketStoreTelegramBot.Features.States.Admin
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             Markup keyboard = new Markup() {
                 KeyboardWithText = _buttons
             };

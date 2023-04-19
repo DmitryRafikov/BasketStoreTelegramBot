@@ -1,4 +1,4 @@
-﻿using BasketStoreTelegramBot.Entities;
+﻿using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.Models;
@@ -11,45 +11,68 @@ using System.Threading.Tasks;
 
 namespace BasketStoreTelegramBot.Services.Product
 {
-    class ProductService : IProductService
+    class ProductService 
     {
-        private static Lazy<ProductService> _productService = new Lazy<ProductService>(() => new ProductService());
-        public static ProductService Instance { get => _productService.Value; }
 
-        private DataContext _dataContext = DataContext.Instance;
-        public ProductEntity GetProduct(int id)
+        private DataContext _dataContext;
+        private DbSet<IProduct> _entities;
+        public ProductService(DbSet<IProduct> entities) {
+            _dataContext = new DataContext();
+            _entities = entities;
+        }
+        public async Task<bool> ProductExists(IProduct productEntity)
         {
-            var product = _dataContext.Products.FirstOrDefault(x => x.Id == id);
+            var product = await _entities.FirstOrDefaultAsync(x => x.Id == productEntity.Id);
+            return product == null;
+        }
+        public async Task UpdateAsync(IProduct productEntity)
+        {
+            var product = await _entities.FirstOrDefaultAsync(x => x.Id == productEntity.Id);
+            if(product == null)
+                _entities.Update(productEntity);
+            await _dataContext.SaveChangesAsync();
+        }
+        public IProduct GetProduct(int id)
+        {
+            var product = _entities.FirstOrDefault(x => x.Id == id);
             if (product != null) return product;
             throw new ArgumentNullException(nameof(product));
         }
-        public async Task AddProductAsync(ProductEntity product)
+        public async Task AddProductAsync(IProduct product)
         {
-            if (product.Id < _dataContext.Products.Count())
-                product.Id = _dataContext.Products.Count() + 1;
-            await _dataContext.Products.AddAsync(product);
+            await _entities.AddAsync(product);
             await _dataContext.SaveChangesAsync();
         }
-        public async Task EditProductAsync(ProductEntity product)
+        public async Task EditProductAsync(IProduct product)
         {
             _dataContext.Update(product);
             await _dataContext.SaveChangesAsync();
         }
-        public async Task DeleteProductAsync(ProductEntity product)
+        public async Task DeleteProductAsync(IProduct product)
         {
             _dataContext.Remove(product);
             await _dataContext.SaveChangesAsync();
         }
         public async Task DeleteProductAsync(int index)
         {
-            var product = await _dataContext.Products.FirstOrDefaultAsync(x => x.Id == index);
+            var product = await _entities.FirstOrDefaultAsync(x => x.Id == index);
             if (product != null) _dataContext.Remove(product);
             else throw new ArgumentNullException(nameof(product));
             await _dataContext.SaveChangesAsync();
         }
-        public ProductEntity GetLast()
+        public IProduct GetLast()
         {
-            return _dataContext.Products.FirstOrDefault(x => x.Id == _dataContext.Products.Count());
+            return _entities.FirstOrDefault(x => x.Id == _entities.Count());
+        }
+        public IEnumerable<IProduct> GetRange(IEnumerable<int> IDs)
+        {
+            foreach (var id in IDs)
+            {
+                yield return _entities.FirstOrDefault(x => x.Id == id);
+            }
+        }
+        public IEnumerable<IProduct> GetAll() {
+            return _entities;
         }
     }
 }

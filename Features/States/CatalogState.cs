@@ -1,7 +1,9 @@
-﻿using BasketStoreTelegramBot.Entities;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
-using BasketStoreTelegramBot.Services.CatalogProduct;
+using BasketStoreTelegramBot.Models;
+using BasketStoreTelegramBot.Services.Product;
 using BasketStoreTelegramBot.StateMachines;
 using BasketStoreTelegramBot.States;
 using System;
@@ -17,7 +19,8 @@ namespace BasketStoreTelegramBot.Features.States
         public StateTypes StateType => StateTypes.CatalogState;
 
         IStateMachine _stateMachine;
-        private static ICatalogProductService _catalogProductService = CatalogProductService.Instance;
+        private ProductService _catalogProductService;
+        private ShoppingBag _shoppingBag;
         private readonly List<string> _buttons = new List<string>() {
             "Изменить",
             "Удалить"
@@ -25,26 +28,38 @@ namespace BasketStoreTelegramBot.Features.States
         public CatalogState(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
+            var dataContext = new DataContext().CatalogProducts;
+            _catalogProductService = new ProductService(dataContext);
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
-            return new PhotoMessagesCollection()
-            {
-                Collection = CreatePhotoMessagesCollection()
-            };
-
+            var products = (List<ProductEntity>)_catalogProductService.GetAll();
+            if (products.Count != 0)
+                return new PhotoMessagesCollection()
+                {
+                    Collection = CreatePhotoMessagesCollection()
+                };
+            else
+                return new TextMessage
+                {
+                    Text = "тут пока нет товаров"
+                };
         }
         public async Task<IMessage> Update(MessageEvent data)
         {
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             if (data.Callback != null)
             {
                 if (data.Callback.Message.Text.ToLower() == "добавить в отложенные")
                 {
-                    ShoppingBag.Instance.AddProductInBag(
-                        CatalogProductEntity.ToProductEntity(
-                            _catalogProductService.GetProduct(Convert.ToInt32(data.Callback.Data)))
-                    );
+                    CatalogProductEntity catalogProduct = _catalogProductService.GetProduct(Convert.ToInt32(data.Callback.Data)).Ti;
+                    _shoppingBag.AddProductInBag(Convert.ToInt32(data.Id), catalogProduct);
                 }
                 return new TextMessage()
                 {
@@ -65,7 +80,8 @@ namespace BasketStoreTelegramBot.Features.States
         private List<PhotoMessage> CreatePhotoMessagesCollection()
         {
             var list = new List<PhotoMessage>();
-            foreach (var item in _catalogProductService.GetAllProducts())
+            var products = (List<ProductEntity>)_catalogProductService.GetAll();
+            foreach (var item in products)
             {
                 var keyboard = new Markup
                 {
@@ -75,7 +91,7 @@ namespace BasketStoreTelegramBot.Features.States
                 {
                     Link = item.PhotoLink,
                     Caption = item.ToString(),
-                    ReplyMarkup = keyboard.Insert()
+                    ReplyMarkup = keyboard.Insert(true)
                 };
                 list.Add(message);
             }

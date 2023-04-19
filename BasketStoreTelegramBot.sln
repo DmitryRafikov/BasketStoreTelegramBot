@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32802.440
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketStoreTelegramBot", "BasketStoreTelegramBot.csproj", "{E81DEA54-88A1-47D7-B58F-1B082A3C53B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasketStoreTelegramBot", "BasketStoreTelegramBot.csproj", "{E81DEA54-88A1-47D7-B58F-1B082A3C53B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketStoreTelegramBotTest", "..\BasketStoreTelegramBotTest\BasketStoreTelegramBotTest.csproj", "{7DD10FD5-81CF-4C33-B15E-95096733F687}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E81DEA54-88A1-47D7-B58F-1B082A3C53B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E81DEA54-88A1-47D7-B58F-1B082A3C53B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E81DEA54-88A1-47D7-B58F-1B082A3C53B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DD10FD5-81CF-4C33-B15E-95096733F687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DD10FD5-81CF-4C33-B15E-95096733F687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DD10FD5-81CF-4C33-B15E-95096733F687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DD10FD5-81CF-4C33-B15E-95096733F687}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

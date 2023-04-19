@@ -8,6 +8,7 @@ namespace BasketStoreTelegramBot.Services.User
     interface IUserService
     {
         public Task<UserEntity> GetValueAsync(Update update);
+        UserEntity GetValue(Update update);
         public Task CreateUserAsync(Update update);
     }
 }

@@ -38,18 +38,18 @@ namespace BasketStoreTelegramBot.MessagesHandle
 
             var keyboard = new List<InlineKeyboardButton[]>();                                  
             int counter = 0;
-            while (counter < KeyboardWithText.Count)
+            while (counter < KeyboardWithCallBack.Count)
             {
-                InlineKeyboardButton[] buttons = new InlineKeyboardButton[2];
-                for (int i = 0; i < buttons.Length; i++)
+                var len = counter == KeyboardWithCallBack.Count - 1 &&
+                           KeyboardWithCallBack.Count % 2 == 1 ? 1 : 2;
+                InlineKeyboardButton[] buttons = new InlineKeyboardButton[len];
+                for (int i = 0; i < len; i++)
                 {
                     if (hasCallBackData)
                         buttons[i] = InlineKeyboardButton.WithCallbackData(
                             text: KeyboardWithCallBack.Keys.ElementAt(counter),
                             callbackData: KeyboardWithCallBack.Values.ElementAt(counter)
                         );
-                    else
-                        buttons[i] = KeyboardWithText[counter];
                     counter++;
                 }
                 keyboard.Add(buttons);

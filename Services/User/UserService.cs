@@ -13,25 +13,26 @@ namespace BasketStoreTelegramBot.Services.User
 {
     class UserService : IUserService
     {
-        private static Lazy<UserService> _userService = new Lazy<UserService>(() => new UserService());
-        public static UserService Instance { get => _userService.Value; }
 
-        private DataContext _dataContext = DataContext.Instance;
+        private DataContext _dataContext;
         public UserService()
         {
-
+            _dataContext = new DataContext();
         }
         public async Task CreateUserAsync(Update update)
         {
             var recordsCount = _dataContext.Users.Count();
             var newUser = new UserEntity
             {
-                ID = recordsCount++,
                 Username = update.Message.Chat.Username,
                 ChatID = update.Message.Chat.Id.ToString(),
                 CurrentState = (int)StateTypes.Init
             };
-            await _dataContext.Users.AddAsync(newUser);
+            if (await Find(newUser))
+                _dataContext.Users.Update(newUser);
+            else
+                await _dataContext.Users.AddAsync(newUser);
+
             await _dataContext.SaveChangesAsync();
         }
         public async Task<UserEntity> GetValueAsync(Update update)
@@ -44,6 +45,46 @@ namespace BasketStoreTelegramBot.Services.User
             var user = await _dataContext.Users.FirstOrDefaultAsync(x => x.ChatID == chatId.ToString());
             if (user != null) return user;
             throw new ArgumentNullException(nameof(user));
+        }
+        public UserEntity GetValue(Update update)
+        {
+            var chatId = update.Type switch
+            {
+                UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat.Id,
+                UpdateType.Message => update.Message.Chat.Id
+            };
+            var user =  _dataContext.Users.FirstOrDefault(x => x.ChatID == chatId.ToString());
+            if (user != null) return user;
+            throw new ArgumentNullException(nameof(user));
+        }
+        public bool TryGetValue(string chatId, out IState state)
+        {
+            var user = _dataContext.Users.FirstOrDefault(x => x.ChatID == chatId);
+            if (user != null)
+            {
+                state = user.State;
+                return true;
+            }
+            state = null;
+            return false;
+        }
+        public UserEntity GetValueByChatId(string chatId)
+        {
+            var user = _dataContext.Users.FirstOrDefault(x => x.ChatID == chatId);
+            if (user != null) return user;
+            throw new ArgumentNullException(nameof(user));
+        }
+        public async Task<bool> Find(UserEntity userEntity) {
+            var user = await _dataContext.Users.FirstOrDefaultAsync(x => x.ChatID == userEntity.ChatID ||
+                                                                x.Username == userEntity.Username);
+            if (user != null) return true;
+            return false;
+        }
+
+        public void Update(UserEntity userEntity)
+        {
+            _dataContext.Users.Update(userEntity);
+            _dataContext.SaveChanges();
         }
     }
 }

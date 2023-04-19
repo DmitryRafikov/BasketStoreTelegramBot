@@ -16,6 +16,7 @@ namespace BasketStoreTelegramBot.Features.ProductInformation
         [JsonProperty("palette")] public string Palette { get; private set; }
         [JsonProperty("palettePhoto")] public string PalettePhoto { get; private set; }
         [JsonProperty("sizes")] public List<SizeContainer> Sizes { get; private set; }
+        [JsonProperty("constantSizes")] public List<SizeContainer> ConstantSizes { get; private set; }
         [JsonProperty("hasConstantSizes")] public bool? HasConstantSizes { get; private set; }
         [JsonProperty("resizable")] public bool? Resizable { get; private set; }
         [JsonProperty("specifics")] public List<Specific> Specifics { get; private set; }

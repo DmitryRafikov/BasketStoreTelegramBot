@@ -18,14 +18,12 @@ namespace BasketStoreTelegramBot
         private static TelegramBotClient _bot;
         private static IStateMachine _stateMachine;
         private static IUserService _userService;
-        private static MessagesFactory _factory;
         static void Main(string[] args)
         {
-            _stateMachine = new StateMachine(CreateInitState);
-            _bot = new TelegramBotClient("5846422307:AAFe--2RJpGiSwQQOEO3KxaxkyQUdIxUMgE");
-            _userService = UserService.Instance;
+            _bot = new TelegramBotClient("5846422307:AAGgssW9osAbTUgUWRVcRQPoxHKmj6dc9XA");
+            _userService = new UserService();
+            _stateMachine = new StateMachine();
             StartBot();
-
             Thread.Sleep(Timeout.Infinite);
         }
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -33,9 +31,9 @@ namespace BasketStoreTelegramBot
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             if (update.Type == UpdateType.Message || update.Type == UpdateType.CallbackQuery)
             {
-                var chat = update.Message.Chat;
-                var message = update.Message;
-                var callback = update.CallbackQuery;
+                Chat? chat = update.Message.Chat;
+                Message? message = update.Message;
+                CallbackQuery? callback = update.CallbackQuery;
 
                 if (chat == null || ((message == null || string.IsNullOrEmpty(message.Text)) && callback == null)) return;
 
@@ -48,13 +46,18 @@ namespace BasketStoreTelegramBot
                 try
                 {
                     var user = await _userService.GetValueAsync(update);
+                    _stateMachine.GetLastActiveState(update);
                 }
                 catch
                 {
                     await _userService.CreateUserAsync(update);
                 }
-                var result = await _stateMachine.FireEvent(data);
-                await MessagesFactory.Instance.SendAsync(chat, result);
+                var result = await _stateMachine.FireEvent(data, update);
+                try
+                {
+                    await MessagesFactory.Instance.SendAsync(chat, result);
+                }
+                catch { }
             }
         }
         public static Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -65,7 +68,6 @@ namespace BasketStoreTelegramBot
                     => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
-
             Console.WriteLine(ErrorMessage);
             return Task.CompletedTask;
         }
@@ -84,9 +86,6 @@ namespace BasketStoreTelegramBot
                 cancellationToken: cts.Token
             );
         }
-        static IState CreateInitState()
-        {
-            return new InitState(_stateMachine);
-        }
+        
     }
 }

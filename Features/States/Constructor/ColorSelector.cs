@@ -4,6 +4,8 @@ using BasketStoreTelegramBot.StateMachines;
 using System.Threading.Tasks;
 using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
+using BasketStoreTelegramBot.Features.States.Constructor.Sizes;
+using System;
 
 namespace BasketStoreTelegramBot.States
 {
@@ -11,9 +13,9 @@ namespace BasketStoreTelegramBot.States
     {
         private readonly IStateMachine _stateMachine;
         private readonly IState? _returnState;
-        private static ProductData currentProduct = ProductDataJsonDeserializer.Instance.
-                                                    CurrentProductInfo(ShoppingBag.Instance.CurrentProduct.Name);
-        private readonly string _colors = currentProduct.Palette;
+        private ShoppingBag _shoppingBag;
+        private ProductData _currentProductData;
+        private string _colors;
 
         public StateTypes StateType => StateTypes.ColorSelector;
 
@@ -30,15 +32,20 @@ namespace BasketStoreTelegramBot.States
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
+            _currentProductData = ProductDataJsonDeserializer.Instance.
+                                                    CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name);
+            _colors = _currentProductData.Palette;
             return new PhotoMessage()
             {
                 Caption = "Выберите необходимый цвет",
-                Link = currentProduct.PalettePhoto,
+                Link = _currentProductData.PalettePhoto,
             };
         }
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
             var text = data.Message.ToLower();
             if (CommandsList.AllCommands.Contains(text))
             {
@@ -47,11 +54,11 @@ namespace BasketStoreTelegramBot.States
             }
             if (_colors.Contains(text))
             {
-                ShoppingBag.Instance.CurrentProduct.Color = text;
+                _shoppingBag.CurrentProduct(chatID).Color = text;
                 IState state;
-                if (currentProduct.Sizes.Count != 0)
-                    state = new SizeSelector(_stateMachine);
-                else if (currentProduct.Specifics.Count != 0)
+                if (_currentProductData.Sizes.Count != 0)
+                    state = new ChooseSizeType(_stateMachine);
+                else if (_currentProductData.Specifics.Count != 0)
                     state = new SpecificsSelection(_stateMachine);
                 else
                     state = new ConstructorEnd(_stateMachine);
@@ -66,6 +73,5 @@ namespace BasketStoreTelegramBot.States
                 Text = "Команда не опознана! Повторите ввод"
             };
         }
-        
     }
 }

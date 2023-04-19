@@ -10,6 +10,6 @@ namespace BasketStoreTelegramBot.Features.Messages
 {
     interface INotifyMessage
     {
-        Task SendAsync(ChatId id, TelegramBotClient bot);
+        Task NotifyAsync(ChatId id, TelegramBotClient bot);
     }
 }

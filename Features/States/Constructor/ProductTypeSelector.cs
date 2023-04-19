@@ -4,6 +4,7 @@ using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
 using BasketStoreTelegramBot.States.Constructor;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,32 +12,42 @@ namespace BasketStoreTelegramBot.States
 {
     class ProductTypeSelector : IState
     {
+        public StateTypes StateType => StateTypes.ProductTypeSelector;
         private readonly IStateMachine _stateMachine;
+        private ShoppingBag _shoppingBag;
         private readonly List<string> _products = ProductDataJsonDeserializer.Instance.GetNames();
-        private List<string> _types = new List<string>();
+        private List<string> _imagesURLs = new List<string>() {
+            "https://sun9-58.userapi.com/impg/ExbZ7_1nc9W0wgJQF_2aniPsHuSZo5lKPEbvYg/vhskMkwQO0o.jpg?size=960x1280&quality=95&sign=63c6447f048f8485b34bd52f0cc5c353&type=album",
+            "https://sun9-27.userapi.com/impg/aW0fECkZ10ssNx3JKJ45cb5GBWDX2cPmUgCIkw/XWrs8YyTN9g.jpg?size=960x1280&quality=95&sign=05b0f3edabb59d467d6b559626443b25&type=album",
+            "https://sun9-61.userapi.com/impg/dI06AJqyADe0kNRYdN56QJsn24Ddx38KJ9fC8A/YxeWOrivSFA.jpg?size=960x1280&quality=95&sign=e365b6b4276411cca78eead43e750e3b&type=album",
+            "https://sun9-59.userapi.com/impg/1H7CKie8yadQd4SyO9gMwfDKbaklvP6SgCPYOw/gP7mvb0CWz8.jpg?size=960x1280&quality=95&sign=e0fd1d97de7d485762657e3da15530c1&type=album",
+            "https://sun9-8.userapi.com/impg/kN7Zo08ATx30MaZNLABi7TdTtxPJynRDip6i4A/axX1kxqdOvs.jpg?size=960x1280&quality=95&sign=744561f2f76d8618b8f564fa92ec3b4d&type=album"
+        };
         public ProductTypeSelector(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
         }
 
-        public StateTypes StateType => StateTypes.ProductTypeSelector;
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
-
-           ShoppingBag.Instance.CreateProduct();
+            _shoppingBag.CreateProduct(Convert.ToInt32(data.Id));
             var keyboard = new Markup()
             {
                 KeyboardWithText = _products
             };
-            return new PhotoMessage()
-            {
-                Caption = "Давайте начнем! Выберите тип товара из предложенных:",
-                Link = "https://sun9-north.userapi.com/sun9-84/s/v1/ig2/eNtfKbTn2LIr3UssDXK2x1jGNkobmoaFkg186BLuAa7kNXR1AfT40oMcI9pAy9V-lPMrK0ZL9kimbzLKZj5y9BK2.jpg?size=533x943&quality=96&type=album",
-                ReplyMarkup = keyboard.Insert()
+            return new MediaGroupMessage() {
+                ReplyMarkup = keyboard.Insert(),
+                TextMessageToChangeKeyboard = "Давайте начнем!",
+                Caption =  "Выберите тип товара из предложенных:",
+                Data = new MediaGroup()
+                {
+                    ItemsURLs = _imagesURLs
+                }
             };
+           
         }
-
         public async Task<IMessage> Update(MessageEvent data)
         {
             var text = data.Message.ToLower();
@@ -52,7 +63,7 @@ namespace BasketStoreTelegramBot.States
             }
             if (_products.Contains(data.Message)) 
             {
-                ShoppingBag.Instance.CurrentProduct.Name = data.Message;
+                _shoppingBag.CurrentProduct(Convert.ToInt32(data.Id)).Name = data.Message;
                 IState state;
                 if (productData.CurrentProductInfo(data.Message).Type != null)
                     state = new BottomTypeSelector(_stateMachine);

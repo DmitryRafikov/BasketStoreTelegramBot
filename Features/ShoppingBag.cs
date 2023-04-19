@@ -1,63 +1,78 @@
 ﻿using BasketStoreTelegramBot.Entities;
+using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Others;
 using BasketStoreTelegramBot.Services.Order;
 using BasketStoreTelegramBot.Services.Product;
+using BasketStoreTelegramBot.Services.ShoppingBagProduct;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 
 namespace BasketStoreTelegramBot.Features
 {
 
     class ShoppingBag
     {
-        private static readonly Lazy<ShoppingBag> bag = new Lazy<ShoppingBag>(() => new ShoppingBag());
-        public static ShoppingBag Instance { get { return bag.Value; } }
-        public ProductEntity CurrentProduct { get => _currentProduct; }
-        public List<ProductEntity> Products { get => _products; }
-        private List<ProductEntity> _products;
-        private ProductEntity _currentProduct;
-        private IProductService _productService = ProductService.Instance;
-        private IOrderService _orderService = OrderService.Instance;
-        private ShoppingBag()
+        private IProductService _productService;
+        private IOrderService _orderService;
+        private IShoppingBagService _shoppingBagService;
+        public ShoppingBag()
         {
-            _products = new List<ProductEntity>();
+            _productService = new ProductService();
+            _orderService = new OrderService();
+            _shoppingBagService = new ShoppingBagService();
         }
-        public void CreateProduct()
+        public void CreateProduct(int chatID)
+        { 
+            _productService.AddProductAsync(new ProductEntity());
+            _shoppingBagService.Add(chatID, _productService.GetLast());
+        }
+        public ProductEntity CurrentProduct(int chatID)
         {
-            int productId = _productService.GetLast().Id + _products.Count() + 1;
-            _currentProduct = new ProductEntity()
-            { 
-                Id = productId
-            };
-            _products.Add(_currentProduct);
+            return _shoppingBagService.GetLastProduct(chatID);
         }
-        public void RemoveProductByIndex(int index) 
+        public IEnumerable<ProductEntity> GetAddedProducts(int chatID)
         {
-            _products.RemoveAt(index);
+            var products = _shoppingBagService.GetRange(chatID).Where(n => n.Added == true);
+            return _productService.GetRange(products.Select(n => Convert.ToInt32(n.ProductID)));
         }
-        public void AddProductInBag(ProductEntity product) {
-            _products.Add(product);
-        }
-        public async Task EndProductSerializationAsync() {
-            await _productService.AddProductAsync(_currentProduct);
-        }
-        public async Task BuildOrderAsync(MessageEvent data) 
+        public void RemoveProduct(int chatID, ProductEntity product) 
         {
+            _shoppingBagService.Remove(new ShoppingBagProduct { 
+                ChatID = chatID.ToString(),
+                ProductID = product.Id.ToString()
+            });
+
+        }
+        public void AddProductInBag(int chatID) {
+            var last = _shoppingBagService.GetLastEntry(chatID);
+            last.Added = true;
+            _shoppingBagService.Update(last);
+        }
+        public void AddProductInBag(int chatID, ProductEntity product)
+        {
+            var last = _shoppingBagService.GetLastEntry(chatID);
+            last.Added = true;
+            _shoppingBagService.Update(last);
+        }
+        public async Task UpdateInfo(int chatID) {
+            var currentProduct = CurrentProduct(chatID);
+            if (await _productService.ProductExists(currentProduct))
+                await _productService.AddProductAsync(currentProduct);
+            await _productService.UpdateAsync(currentProduct);
+            
+        }
+        public async Task BuildOrderAsync(int chatID) 
+        {
+            var products = GetAddedProducts(chatID);
             var order = new OrderEntity()
             {
-                Id = _orderService.GetLast().Id,
-                ChatID = data.Id,
-                ProductIDs = ListConverter.ToString(_products.Select(x => x.Id.ToString()).ToList(), ", "),
-                Cost = (int)_products.Sum(x => x.Cost != null ?
-                                                        x.Cost :
-                                                        ProductExtension.CalculateCost(x))
+                ChatID = chatID.ToString(),
+                ProductIDs = ListConverter.ToString(products.Select(x => x.Id.ToString()).ToList(), ", "),
+                Cost = (int)products.Sum(x => x.Cost)
             };
             await _orderService.AddOrderAsync(order);
         }
-
     }
 }

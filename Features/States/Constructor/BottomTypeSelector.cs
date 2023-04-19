@@ -1,4 +1,5 @@
-﻿using BasketStoreTelegramBot.Features;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
@@ -38,9 +39,15 @@ namespace BasketStoreTelegramBot.States.Constructor
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             if (_types.Contains(data.Message))
             {
-                ShoppingBag.Instance.CurrentProduct.BottomType = data.Message;
+                var shoppingBag = new ShoppingBag();
+                shoppingBag.CurrentProduct(Convert.ToInt32(data.Id)).BottomType = data.Message;
                 var state = new ColorSelector(_stateMachine);
                 _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);

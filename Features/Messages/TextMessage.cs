@@ -14,7 +14,7 @@ namespace BasketStoreTelegramBot.MessagesHandle
         {
             await bot.SendTextMessageAsync(chat.Id, Text, replyMarkup: ReplyMarkup);
         }
-        public async Task SendAsync(ChatId id, TelegramBotClient bot)
+        public async Task NotifyAsync(ChatId id, TelegramBotClient bot)
         {
             await bot.SendTextMessageAsync(id, Text, replyMarkup: ReplyMarkup);
         }

@@ -1,11 +1,11 @@
 ﻿using BasketStoreTelegramBot.Comands;
-using BasketStoreTelegramBot.Entities;
+using BasketStoreTelegramBot.Entities.Products;
 using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.Others;
-using BasketStoreTelegramBot.Services.Product;
 using BasketStoreTelegramBot.StateMachines;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,13 +15,12 @@ namespace BasketStoreTelegramBot.States
     {
         private readonly IStateMachine _stateMachine;
         private readonly IState _returnState;
-        private static ProductEntity currentProduct = ShoppingBag.Instance.CurrentProduct;
-        private static ProductData currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                            CurrentProductInfo(ShoppingBag.Instance.CurrentProduct.Name,
-                                                                 ShoppingBag.Instance.CurrentProduct.BottomType);
+        private ShoppingBag _shoppingBag;
+        private static ProductEntity _currentProduct;
+        private static ProductData _currentProductInfo;
         private List<string> Specifics()
         {
-            return currentProductInfo.GetSpecifics(currentProduct.Diameter.Value);
+            return _currentProductInfo.GetSpecifics(_currentProduct.Diameter.Value);
         }
         public List<string> Selected { get; private set; }
 
@@ -30,17 +29,24 @@ namespace BasketStoreTelegramBot.States
         public SpecificsSelection(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
             Selected = new List<string>();
         }
         public SpecificsSelection(IStateMachine stateMachine, IState returnState)
         {
             _stateMachine = stateMachine;
             _returnState = returnState;
+            _shoppingBag = new ShoppingBag();
             Selected = new List<string>();
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
+            _currentProduct = _shoppingBag.CurrentProduct(chatID);
+            _currentProductInfo = ProductDataJsonDeserializer.Instance.
+                                            CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
+                                                                 _shoppingBag.CurrentProduct(chatID).BottomType);
             var keyboard = new Markup()
             {
                 KeyboardWithText = DefineButtons()
@@ -61,6 +67,7 @@ namespace BasketStoreTelegramBot.States
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
             var text = data.Message.ToLower();
             var keyboard = new Markup()
             {
@@ -78,7 +85,7 @@ namespace BasketStoreTelegramBot.States
                         Selected.Clear();
                         Selected.Add(text);
                     }
-                    ShoppingBag.Instance.CurrentProduct.Specifics = ListConverter.ToString(Selected);
+                    _shoppingBag.CurrentProduct(chatID).Description = ListConverter.ToString(Selected);
                     IState state = new ConstructorEnd(_stateMachine);
                     if (_returnState != null)
                         state = _returnState;

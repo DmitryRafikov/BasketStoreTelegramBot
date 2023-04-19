@@ -6,15 +6,15 @@ using System.Linq;
 using System;
 using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.Features.ProductInformation;
+using BasketStoreTelegramBot.Comands;
 
 namespace BasketStoreTelegramBot.States
 {
     class ConstructorEnd : IState
     {
         private readonly IStateMachine _stateMachine;
-        private static ProductData _currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                           CurrentProductInfo(ShoppingBag.Instance.CurrentProduct.Name,
-                                                                ShoppingBag.Instance.CurrentProduct.BottomType);
+        private ProductData _currentProductInfo;
+        private ShoppingBag _shoppingBag;
         private readonly List<string> _buttons = new List<string>() {
             "Изменить",
             "Добавить в отложенные",
@@ -26,31 +26,21 @@ namespace BasketStoreTelegramBot.States
         public ConstructorEnd(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
-        }
-
-        private List<string> _changeButtons()
-        {
-            List<string> buttons = new();
-            var product = ShoppingBag.Instance.CurrentProduct;
-            buttons.Add("Изменить цвет");
-            if (_currentProductInfo.Resizable.Value)
-            {
-                buttons.Add("Изменить размер");
-            }
-            if (_currentProductInfo.Specifics != null)
-            {
-                buttons.Add("Изменить особенности");
-            }
-            return buttons;
+            _shoppingBag = new ShoppingBag();
         }
         public async Task<IMessage> Initialize(MessageEvent data)
         {
-
+            int chatID = Convert.ToInt32(data.Id);
+            _currentProductInfo = ProductDataJsonDeserializer.Instance.
+                                           CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
+                                                                _shoppingBag.CurrentProduct(chatID).BottomType);
+            _shoppingBag.CurrentProduct(chatID).PhotoLink = _currentProductInfo.Photo;
+            _shoppingBag.AddProductInBag(chatID);
             var keyboard = new Markup()
             {
                 KeyboardWithText = _buttons
             };
-            var product = ShoppingBag.Instance.CurrentProduct;
+            var product = _shoppingBag.CurrentProduct(chatID);
             return new PhotoMessage()
             {
                 Link = _currentProductInfo.Photo,
@@ -63,11 +53,15 @@ namespace BasketStoreTelegramBot.States
         public async Task<IMessage> Update(MessageEvent data)
         {
             var text = data.Message.ToLower();
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             if (_buttons.Contains(data.Message))
             {
                 if (text == "добавить в отложенные")
                 {
-                    await ShoppingBag.Instance.EndProductSerializationAsync();
                     return new TextMessage
                     {
                         Text = "Добавлено в отложенные"

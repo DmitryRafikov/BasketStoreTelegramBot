@@ -9,12 +9,19 @@ namespace BasketStoreTelegramBot
 {
     class MediaGroupMessage : IMessage
     {
-        public string Caption = null;
-        public IReplyMarkup ReplyMarkup = new ReplyKeyboardRemove();
-        public MediaGroup Data;
+        public MediaGroup Data { get; set; }
+        public string? Caption { get; set; }
+        public ReplyKeyboardMarkup? ReplyMarkup { get; set; }
+        public string? TextMessageToChangeKeyboard { get; set; }
         public async Task SendAsync(Chat chat, TelegramBotClient bot)
         {
-            //await bot.SendMediaGroupAsync(chat.Id, Data.Insert(), Caption);
+            if (ReplyMarkup != null && (TextMessageToChangeKeyboard != null || TextMessageToChangeKeyboard != string.Empty))
+            {
+               await bot.SendTextMessageAsync(chat.Id, TextMessageToChangeKeyboard, replyMarkup: ReplyMarkup);
+            }
+            var message = await bot.SendMediaGroupAsync(chat.Id, Data.Insert());
+            if (Caption != null || Caption != string.Empty)                
+                await bot.EditMessageCaptionAsync(chat.Id, message[message.Length - 1].MessageId, Caption);
         }
     }
 }

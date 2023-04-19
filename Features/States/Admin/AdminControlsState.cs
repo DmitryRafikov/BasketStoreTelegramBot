@@ -1,4 +1,5 @@
-﻿using BasketStoreTelegramBot.MessagesHandle;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
 using BasketStoreTelegramBot.States;
 using System;
@@ -33,6 +34,11 @@ namespace BasketStoreTelegramBot.Features.States.Admin
 
         public async Task<IMessage> Update(MessageEvent data)
         {
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             var keyboard = new Markup()
             {
                 KeyboardWithText = _buttons

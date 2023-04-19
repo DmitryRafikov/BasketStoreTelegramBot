@@ -1,4 +1,3 @@
-
 [
   {
     "name": "Коризна вязаная (круглое дно)",
@@ -10,19 +9,24 @@
     "sizes": [
       {
         "height": 16,
-        "diameter": 9
+        "diameter": 9,
+        "cost": 1200
+
       },
       {
         "height": 14,
-        "diameter": 8
+        "diameter": 8,
+        "cost": 1000
       },
       {
         "height": 12,
-        "diameter": 9
+        "diameter": 9,
+        "cost": 800
       },
       {
         "height": 11,
-        "diameter": 7
+        "diameter": 7,
+        "cost": 600
       }
     ],
     "resizable": true,
@@ -50,7 +54,7 @@
         }
       }
     ],
-    "min-cost": 0
+    "min-cost": 2
   },
   {
     "name": "Коризна вязаная (круглое дно)",
@@ -59,18 +63,18 @@
     "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
     "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
     "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
-    "sizes": [
+    "constantSizes": [
       {
-        "height": 10
+        "diameter": 10
       },
       {
-        "height": 15
+        "diameter": 15
       },
       {
-        "height": 25
+        "diameter": 25
       },
       {
-        "height": 30
+        "diameter": 30
       }
     ],
     "resizable": true,
@@ -99,7 +103,7 @@
         }
       }
     ],
-    "min-cost": 0
+    "min-cost": 2
   },
   {
     "name": "Коризна вязаная (Прямоугольное дно)",
@@ -112,11 +116,13 @@
       {
         "height": 9,
         "length": 23,
-        "width": 16
+        "width": 16,
+        "cost": 1300
+
       }
     ],
     "resizable": true,
-    "min-cost": 0
+    "min-cost": 2
   },
   {
     "name": "Коризна вязаная (Прямоугольное дно)",
@@ -130,10 +136,12 @@
         "height": 9,
         "length": 23,
         "width": 16
+
       }
     ],
+    "hasConstantSizes": true,
     "resizable": true,
-    "min-cost": 0
+    "min-cost": 2
   },
     {
       "name": "Корзина-ракушка",
@@ -142,13 +150,14 @@
       "palettePhoto": "",
       "sizes": [
         {
-          "length": 30
+          "length": 30,
+          "cost": 1800
         },
         {
-          "length": 22
+          "length": 22,
+          "cost": 1200
         }
-      ],
-      "min-cost": 0
+      ]
     },
     {
       "name": "Салфетница",
@@ -159,10 +168,10 @@
         {
           "height": 17,
           "length": 25,
-          "width": 15
+          "width": 15,
+          "cost": 1800
         }
-      ],
-      "min-cost": 0
+      ]
     },
     {
       "name": "Сумка-шоппер",
@@ -173,10 +182,10 @@
         {
           "handles": 45, //?o?ee
           "length": 30,
-          "width": 30
+          "width": 30,
+          "cost": 1800
         }
-      ],
-      "min-cost": 0
+      ]
     }
 ]
 

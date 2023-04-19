@@ -1,6 +1,8 @@
-﻿using BasketStoreTelegramBot.Features;
+﻿using BasketStoreTelegramBot.Comands;
+using BasketStoreTelegramBot.Features;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,6 +33,11 @@ namespace BasketStoreTelegramBot.States.Payment
         public async Task<IMessage> Update(MessageEvent data)
         {
             var message = data.Message.ToLower();
+            if (CommandsList.AllCommands.Contains(data.Message.ToLower()))
+            {
+                CommandExecutor action = new CommandExecutor(_stateMachine);
+                return await action.DefineCommand(data.Message.ToLower(), data);
+            }
             IState state;
             if (message == "изменить")
             {
@@ -38,7 +45,8 @@ namespace BasketStoreTelegramBot.States.Payment
             }
             if (message == "подтвердить и оплатить")
             {
-                await ShoppingBag.Instance.BuildOrderAsync(data);
+                ShoppingBag bag = new ShoppingBag();
+                await bag.BuildOrderAsync(Convert.ToInt32(data));
             }
             return new TextMessage
             {
