@@ -31,27 +31,30 @@ namespace BasketStoreTelegramBot
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             if (update.Type == UpdateType.Message || update.Type == UpdateType.CallbackQuery)
             {
-                Chat? chat = update.Message.Chat;
+                Chat chat;
                 Message? message = update.Message;
-                CallbackQuery? callback = update.CallbackQuery;
+                CallbackQuery? callback = update.CallbackQuery; 
+                if (update.Type == UpdateType.CallbackQuery)
+                {
+                    chat = callback.Message.Chat;
+                }
+                else 
+                {
+                    chat = message.Chat;
+                }
 
                 if (chat == null || ((message == null || string.IsNullOrEmpty(message.Text)) && callback == null)) return;
 
                 var data = new MessageEvent
                 {
                     Id = chat.Id.ToString(),
-                    Message = message.Text,
+                    Message = message == null? string.Empty: message.Text,
                     Callback = callback
                 };
-                try
-                {
-                    var user = await _userService.GetValueAsync(update);
+                if(_userService.UserExist(update))
                     _stateMachine.GetLastActiveState(update);
-                }
-                catch
-                {
+                else
                     await _userService.CreateUserAsync(update);
-                }
                 var result = await _stateMachine.FireEvent(data, update);
                 try
                 {

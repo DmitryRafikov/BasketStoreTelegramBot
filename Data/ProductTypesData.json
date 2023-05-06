@@ -1,6 +1,6 @@
 [
   {
-    "name": "Коризна вязаная (круглое дно)",
+    "name": "Корзина вязаная (круглое дно)",
     "format": "ВЫСОТАхДИАМЕТР",
     "type": "Простая",
     "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
@@ -37,32 +37,49 @@
           "min": 8,
           "max": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       },
       {
         "name": "Ручки вязаные",
         "dependsOfSize": {
           "min": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       },
       {
         "name": "Ручки кожанные",
         "dependsOfSize": {
           "min": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       }
     ],
     "min-cost": 2
   },
   {
-    "name": "Коризна вязаная (круглое дно)",
+    "name": "Корзина вязаная (круглое дно)",
     "format": "ВЫСОТАхДИАМЕТР",
     "type": "Деревянное дно",
-    "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
-    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
-    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "photo": "https://sun9-12.userapi.com/impg/G7r8vjnTUp4YwseFwcZxX1tG_lp-pD5BH90AoQ/BHMmCB8tOGY.jpg?size=960x1280&quality=95&sign=4c444b4347817acd9604426ad07fde77&type=album",
+    "palette": "графит эвкалипт небо капучино ваниль",
+    "palettePhoto": "https://sun9-8.userapi.com/impg/JtgTygZNvycnJMCOhu_cHR278UYqY4JSJ9Mr9A/DM45nhGIYoA.jpg?size=1132x2160&quality=95&sign=1190db78204adbb412b3dc93c982d0df&type=album",
+    "sizes": [
+      {
+        "diameter": 10,
+        "height": 12
+      },
+      {
+        "diameter": 10,
+        "height": 14
+      },
+      {
+        "diameter": 10,
+        "height": 16
+      }
+    ],
     "constantSizes": [
       {
         "diameter": 10
@@ -86,27 +103,30 @@
           "min": 8,
           "max": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       },
       {
         "name": "Ручки вязаные",
         "dependsOfSize": {
           "min": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       },
       {
         "name": "Ручки кожанные",
         "dependsOfSize": {
           "min": 20,
           "type": "diameter"
-        }
+        },
+        "cost": 300
       }
     ],
-    "min-cost": 2
+    "min-cost": 3
   },
   {
-    "name": "Коризна вязаная (Прямоугольное дно)",
+    "name": "Корзина вязаная (Прямоугольное дно)",
     "format": "ВЫСОТАхДЛИНАхШИРИНА",
     "type": "Простая",
     "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
@@ -125,12 +145,12 @@
     "min-cost": 2
   },
   {
-    "name": "Коризна вязаная (Прямоугольное дно)",
+    "name": "Корзина вязаная (Прямоугольное дно)",
     "format": "ВЫСОТАхДЛИНАхШИРИНА",
     "type": "С деревянным дном",
     "photo": "https://sun9-east.userapi.com/sun9-30/s/v1/ig2/EH3Ia3ENcvejZ2jEQsJ31aKrDk7_U2Q5jghGy95-8vY4blY4PCaeXiJvtOkKbUvbgNXMtnmNROXTavop0N_-peHS.jpg?size=959x1280&quality=96&type=album",
-    "palette": "пихта хаки шалфей олива горчица дыня лимонный экрю вино корица айвори латте хурма курага мандарин абрикос графит лондон грей пломбир пыльная мята топаз ниагара скай лаванда пурпурный черный мусс пыльная роза ягодный малина крем зефир",
-    "palettePhoto": "https://sun4.userapi.com/sun4-12/s/v1/ig2/g8X03W4s6CjGHSCKZfhYA6jNkP2oo4LT7nZAlyhZ2mfEdMU6cZPTNWX3tpEUf4x1iE3tUZphNerO0WNryCPTzc4g.jpg?size=1000x2000&quality=96&type=album",
+    "palette": "графит эвкалипт небо капучино ваниль",
+    "palettePhoto": "https://sun9-8.userapi.com/impg/JtgTygZNvycnJMCOhu_cHR278UYqY4JSJ9Mr9A/DM45nhGIYoA.jpg?size=1132x2160&quality=95&sign=1190db78204adbb412b3dc93c982d0df&type=album",
     "sizes": [
       {
         "height": 9,
@@ -143,36 +163,38 @@
     "resizable": true,
     "min-cost": 2
   },
-    {
-      "name": "Корзина-ракушка",
-      "photo": "",
-      "palette": "",
-      "palettePhoto": "",
-      "sizes": [
-        {
-          "length": 30,
-          "cost": 1800
-        },
-        {
-          "length": 22,
-          "cost": 1200
-        }
-      ]
-    },
-    {
-      "name": "Салфетница",
-      "photo": "",
-      "palette": "",
-      "palettePhoto": "",
-      "sizes": [
-        {
-          "height": 17,
-          "length": 25,
-          "width": 15,
-          "cost": 1800
-        }
-      ]
-    },
+  {
+    "name": "Корзина-ракушка",
+    "format": "ДЛИНА",
+    "photo": "https://sun9-61.userapi.com/impg/dI06AJqyADe0kNRYdN56QJsn24Ddx38KJ9fC8A/YxeWOrivSFA.jpg?size=960x1280&quality=95&sign=e365b6b4276411cca78eead43e750e3b&type=album",
+    "palette": "матча графит небо руби крем",
+    "palettePhoto": "https://sun9-2.userapi.com/impg/oEhg1zqgQd7vkiru7nV4rIkYp9SuWqeCkKURQA/fhdiEa92ySs.jpg?size=1132x2160&quality=95&sign=973e87390390c918a81840e9643124b4&type=album",
+    "sizes": [
+      {
+        "length": 30,
+        "cost": 1800
+      },
+      {
+        "length": 22,
+        "cost": 1200
+      }
+    ]
+  },
+  {
+    "name": "Салфетница",
+    "format": "ВЫСОТАхДЛИНАхШИРИНА",
+    "photo": "https://sun9-59.userapi.com/impg/1H7CKie8yadQd4SyO9gMwfDKbaklvP6SgCPYOw/gP7mvb0CWz8.jpg?size=960x1280&quality=95&sign=e0fd1d97de7d485762657e3da15530c1&type=album",
+    "palette": "графит эвкалипт небо капучино ваниль",
+    "palettePhoto": "https://sun9-8.userapi.com/impg/JtgTygZNvycnJMCOhu_cHR278UYqY4JSJ9Mr9A/DM45nhGIYoA.jpg?size=1132x2160&quality=95&sign=1190db78204adbb412b3dc93c982d0df&type=album",
+    "sizes": [
+      {
+        "height": 17,
+        "length": 25,
+        "width": 15,
+        "cost": 1800
+      }
+    ]
+  },
     {
       "name": "Сумка-шоппер",
       "photo": "",

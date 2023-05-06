@@ -6,6 +6,7 @@ using BasketStoreTelegramBot.Comands;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Collections.Generic;
 using BasketStoreTelegramBot.Features;
+using BasketStoreTelegramBot.Features.States;
 
 namespace BasketStoreTelegramBot.States
 {
@@ -19,6 +20,11 @@ namespace BasketStoreTelegramBot.States
         }
 
         public StateTypes StateType => StateTypes.Init;
+        List<string> _buttons = new()
+        {
+            "Создать свое",
+            "Выбрать готовое"
+        };
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
@@ -27,9 +33,7 @@ namespace BasketStoreTelegramBot.States
             {
                 var keyboard = new Markup()
                 {
-                    KeyboardWithText = new List<string>() {
-                        "Создать корзину",
-                    }
+                    KeyboardWithText = _buttons
                 };
                 return new TextMessage
                 {
@@ -52,17 +56,25 @@ namespace BasketStoreTelegramBot.States
                 CommandExecutor action = new CommandExecutor(_stateMachine);
                 return await action.DefineCommand(text, data);
             }
-            if (text == "создать корзину")
+            if (_buttons.Contains(data.Message))
             {
-                var state = new ProductTypeSelector(_stateMachine);
+                IState state = null;
+                if (text == "создать свое")
+                {
+                    state = new ProductTypeSelector(_stateMachine);
+
+                }
+                if (text == "выбрать готовое")
+                {
+                    state = new CatalogState(_stateMachine);
+                }
+
                 _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);
             }
             var keyboard = new Markup()
             {
-                KeyboardWithText = new List<string>() {
-                        "Создать корзину",
-                    }
+                KeyboardWithText = _buttons
             };
             if (text == CommandsList.StartCommand)
             {                

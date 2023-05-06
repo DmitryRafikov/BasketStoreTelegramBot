@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BasketStoreTelegramBot": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\vladu\\source\\repos\\BasketStoreTelegramBot"
+    }
+  }
+}

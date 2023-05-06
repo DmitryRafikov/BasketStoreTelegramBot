@@ -31,16 +31,15 @@ namespace BasketStoreTelegramBot.States
         public async Task<IMessage> Initialize(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
-            _currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                           CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
-                                                                _shoppingBag.CurrentProduct(chatID).BottomType);
-            _shoppingBag.CurrentProduct(chatID).PhotoLink = _currentProductInfo.Photo;
+            _currentProductInfo = GetProductData(chatID);
+            var product = _shoppingBag.CurrentProduct(chatID);
+            product.PhotoLink = _currentProductInfo.Photo;
+            await _shoppingBag.UpdateInfo(product);
             _shoppingBag.AddProductInBag(chatID);
             var keyboard = new Markup()
             {
                 KeyboardWithText = _buttons
             };
-            var product = _shoppingBag.CurrentProduct(chatID);
             return new PhotoMessage()
             {
                 Link = _currentProductInfo.Photo,
@@ -79,10 +78,23 @@ namespace BasketStoreTelegramBot.States
                 _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);
             }
+            var keyboard = new Markup()
+            {
+                KeyboardWithText = _buttons
+            };
             return new TextMessage { 
-                Text = "Команда не опознана!"
+                Text = "Не получилось опознать команду. Пожалуйста, выберите действие из предложенных",
+                ReplyMarkup = keyboard.Insert()
             };
         }
-
+        private ProductData GetProductData(int chatID)
+        {
+            var product = _shoppingBag.CurrentProduct(chatID);
+            var name = product.Name;
+            var bottom = product.BottomType;
+            if (bottom != null)
+                return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name, bottom);
+            return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name);
+        }
     }
 }

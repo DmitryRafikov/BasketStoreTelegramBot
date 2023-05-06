@@ -14,11 +14,9 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
 {
     internal class ExistingSizeSelector:IState
     {
-        public StateTypes StateType => StateTypes.OwnSizeCreator;
+        public StateTypes StateType => StateTypes.ExistingSizeSelector;
         private IStateMachine _stateMachine;
         private IState _returnState;
-        private string? _format;
-        private ProductData _currentProductData;
         private SizeContainer _sizes;
         private ShoppingBag _shoppingBag;
         public ExistingSizeSelector(IStateMachine stateMachine)
@@ -35,20 +33,17 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
         public async Task<IMessage> Initialize(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
-            _currentProductData = ProductDataJsonDeserializer.Instance.
-                                                   CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
-                                                                        _shoppingBag.CurrentProduct(chatID).BottomType);
-            _format = _currentProductData.Format;
+            var format = GetProductData(chatID).Format;
             var keyboard = new Markup()
             {
-                KeyboardWithText = InsertSizeValues(_currentProductData.Sizes)
+                KeyboardWithText = InsertSizeValues(GetProductData(chatID).Sizes)
             };
-            string text = _currentProductData.HasConstantSizes != null ? "" : " или напишите свой собственный.";
+            string text = GetProductData(chatID).HasConstantSizes != null ? "" : " или напишите свой собственный.";
             return new TextMessage()
             {
                 Text = "Выберите необходимый вам размер" + text +
 
-                "\nВсе размеры указаны в сантиметрах в формате " + _format,
+                "\nВсе размеры указаны в сантиметрах в формате " + format,
                 ReplyMarkup = keyboard.Insert()
             };
         }
@@ -56,7 +51,9 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
         public async Task<IMessage> Update(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
+            var format = GetProductData(chatID).Format;
             var text = data.Message.ToLower();
+            var product = _shoppingBag.CurrentProduct(chatID);
             if (CommandsList.AllCommands.Contains(text))
             {
                 CommandExecutor action = new CommandExecutor(_stateMachine);
@@ -64,8 +61,8 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
             }
             try
             {
-                SizeContainer enteredSizeContainer = SizeHelper.ToSizeContainer(_format, text);
-                SizeContainer foundedSizeContainer = _currentProductData.Sizes.First(n => n.Equals(enteredSizeContainer));
+                SizeContainer enteredSizeContainer = SizeHelper.ToSizeContainer(format, text);
+                SizeContainer foundedSizeContainer = GetProductData(chatID).Sizes.First(n => n.Equals(enteredSizeContainer));
                 int cost = 0;
                 if (foundedSizeContainer != null)
                 {
@@ -73,14 +70,15 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
                     if (foundedSizeContainer.Cost != null)
                         cost = foundedSizeContainer.Cost.Value;
                 }
-                SerializeProductSizes(_sizes, _shoppingBag.CurrentProduct(chatID));
-                _shoppingBag.CurrentProduct(chatID).Cost = cost;
+                SerializeProductSizes(_sizes, product);
+                product.Cost = cost;
+                await _shoppingBag.UpdateInfo(product);
             }
             catch
             {
                 var keyboard = new Markup()
                 {
-                    KeyboardWithText = InsertSizeValues(_currentProductData.Sizes)
+                    KeyboardWithText = InsertSizeValues(GetProductData(chatID).Sizes)
                 };
                 return new TextMessage()
                 {
@@ -90,12 +88,12 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
             }
             IState state;
             bool hasSpecifics;
-            if (_shoppingBag.CurrentProduct(chatID).Diameter.HasValue)
-                hasSpecifics = _currentProductData.GetSpecifics(_shoppingBag.CurrentProduct(chatID).Diameter.Value).Count == 0;
+            if (product.Diameter != null)
+                hasSpecifics = GetProductData(chatID).GetSpecifics(_shoppingBag.CurrentProduct(chatID).Diameter.Value).Count == 0;
             else
                 hasSpecifics = false;
 
-            if (_currentProductData.Specifics == null && !hasSpecifics)
+            if (GetProductData(chatID).Specifics == null && !hasSpecifics)
                 state = new ConstructorEnd(_stateMachine);
             else
                 state = new SpecificsSelection(_stateMachine);
@@ -118,6 +116,15 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
             product.Diameter = sizes.Diameter;
             product.Length = sizes.Length;
             product.AdditionalSize = sizes.AdditionalSize;
+        }
+        private ProductData GetProductData(int chatID)
+        {
+            var product = _shoppingBag.CurrentProduct(chatID);
+            var name = product.Name;
+            var bottom = product.BottomType;
+            if (bottom != null)
+                return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name, bottom);
+            return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name);
         }
     }
 }

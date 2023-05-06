@@ -77,10 +77,18 @@ namespace BasketStoreTelegramBot.Services.User
         public async Task<bool> Find(UserEntity userEntity) {
             var user = await _dataContext.Users.FirstOrDefaultAsync(x => x.ChatID == userEntity.ChatID ||
                                                                 x.Username == userEntity.Username);
-            if (user != null) return true;
-            return false;
+            return user != null;
         }
-
+        public bool UserExist(Update update)
+        {
+            var chatId = update.Type switch
+            {
+                UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat.Id,
+                UpdateType.Message => update.Message.Chat.Id
+            };
+            var user = _dataContext.Users.FirstOrDefault(x => x.ChatID == chatId.ToString());
+            return user != null;
+        }
         public void Update(UserEntity userEntity)
         {
             _dataContext.Users.Update(userEntity);

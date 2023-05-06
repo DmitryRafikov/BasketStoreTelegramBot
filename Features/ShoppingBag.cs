@@ -14,7 +14,7 @@ namespace BasketStoreTelegramBot.Features
 
     class ShoppingBag
     {
-        private IProductService _productService;
+        private ProductService _productService;
         private IOrderService _orderService;
         private IShoppingBagService _shoppingBagService;
         public ShoppingBag()
@@ -39,10 +39,10 @@ namespace BasketStoreTelegramBot.Features
         }
         public void RemoveProduct(int chatID, ProductEntity product) 
         {
-            _shoppingBagService.Remove(new ShoppingBagProduct { 
-                ChatID = chatID.ToString(),
-                ProductID = product.Id.ToString()
-            });
+            var recordToRemove = _shoppingBagService.GetRange(chatID)
+                                                    .ToList()
+                                                    .First(x => x.ProductID == product.Id.ToString());
+            _shoppingBagService.Remove(recordToRemove);
 
         }
         public void AddProductInBag(int chatID) {
@@ -56,9 +56,8 @@ namespace BasketStoreTelegramBot.Features
             last.Added = true;
             _shoppingBagService.Update(last);
         }
-        public async Task UpdateInfo(int chatID) {
-            var currentProduct = CurrentProduct(chatID);
-            if (await _productService.ProductExists(currentProduct))
+        public async Task UpdateInfo(ProductEntity currentProduct) {
+            if (!_productService.ProductExists(currentProduct))
                 await _productService.AddProductAsync(currentProduct);
             await _productService.UpdateAsync(currentProduct);
             

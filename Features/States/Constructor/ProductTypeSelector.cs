@@ -64,6 +64,8 @@ namespace BasketStoreTelegramBot.States
             if (_products.Contains(data.Message)) 
             {
                 _shoppingBag.CurrentProduct(Convert.ToInt32(data.Id)).Name = data.Message;
+                var product = _shoppingBag.CurrentProduct(Convert.ToInt32(data.Id));
+                await _shoppingBag.UpdateInfo(product);
                 IState state;
                 if (productData.CurrentProductInfo(data.Message).Type != null)
                     state = new BottomTypeSelector(_stateMachine);

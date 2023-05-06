@@ -42,8 +42,8 @@ namespace BasketStoreTelegramBot
         }
         public void GetLastActiveState(Update update)
         {
-            UserEntity user = _userService.GetValueByChatId(update.Message.Chat.Id.ToString());
-            user.State = GetState(_userService.GetValue(update).CurrentState);
+            UserEntity user = _userService.GetValue(update);
+            user.State = GetState(user.CurrentState);
         }
         public IState GetState(int stateNumber)
         {
@@ -64,8 +64,9 @@ namespace BasketStoreTelegramBot
                 case StateTypes.AdminControlsState: return new AdminControlsState(this);
                 case StateTypes.UserNotificationState: return new UserNotificationState(this);
                 case StateTypes.CatalogState: return new CatalogState(this);
-                case StateTypes.OwnSizeCreator: return new OwnSizeCreator(this);
+                case StateTypes.ConstantOwnSizesCreator: return new ConstantOwnSizesCreator(this);
                 case StateTypes.ExistingSizeSelector: return new ExistingSizeSelector(this);
+                case StateTypes.CustomOwnSizesCreator: return new CustomOwnSizesCreator(this);
                 default: throw new ArgumentOutOfRangeException(nameof(stateNumber));
             }
         }

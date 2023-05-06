@@ -5,6 +5,7 @@ using BasketStoreTelegramBot.Features.ProductInformation;
 using BasketStoreTelegramBot.MessagesHandle;
 using BasketStoreTelegramBot.StateMachines;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace BasketStoreTelegramBot.States
         public async Task<IMessage> Initialize(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
-            List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
+            List<ProductEntity> products = _shoppingBag.GetAddedProducts(chatID).ToList();
             if (products.Count != 0)
                 return new PhotoMessagesCollection()
                 {
@@ -46,16 +47,27 @@ namespace BasketStoreTelegramBot.States
             }
             if (data.Callback != null)
             {
-                if (data.Callback.Message.Text.ToLower() == "удалить")
+                var callbackText = data.Callback.Message.ReplyMarkup.InlineKeyboard.ToList();
+                if (callbackText[Convert.ToInt32(data.Callback.Data)-1].ToList()[Convert.ToInt32(data.Callback.Data)-1].Text.ToLower() == "удалить")
                 {
                     int chatID = Convert.ToInt32(data.Id);
-                    List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
-                    var productToRemove = products[Convert.ToInt32(data.Callback.Data)];
-                    _shoppingBag.RemoveProduct(chatID, productToRemove);
-                    return new TextMessage()
+                    List<ProductEntity> products = _shoppingBag.GetAddedProducts(chatID).ToList();
+                    try
                     {
-                        Text = "Выбранный товар удален из списка товаров"
-                    };
+                        var productToRemove = products[Convert.ToInt32(data.Callback.Data)];
+                        _shoppingBag.RemoveProduct(chatID, productToRemove);
+                        return new TextMessage()
+                        {
+                            Text = "Выбранный товар удален из списка товаров"
+                        };
+                    }
+                    catch
+                    {
+                        return new TextMessage()
+                        {
+                            Text = "Данный товар был удален ранее"
+                        };
+                    }
                 }
                 return new TextMessage()
                 {
@@ -76,7 +88,7 @@ namespace BasketStoreTelegramBot.States
         }
         private List<PhotoMessage> CreatePhotoMessagesCollection(int chatID) {
             var list = new List<PhotoMessage>();
-            List<ProductEntity> products = (List<ProductEntity>)_shoppingBag.GetAddedProducts(chatID);
+            List<ProductEntity> products = _shoppingBag.GetAddedProducts(chatID).ToList();
             foreach (var item in products) {
                 var keyboard = new Markup
                 {

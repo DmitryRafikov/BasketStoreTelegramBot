@@ -8,7 +8,6 @@ namespace BasketStoreTelegramBot.MessagesHandle
     {
         public List<string> KeyboardWithText;
         public Dictionary<string,string> KeyboardWithCallBack;
-        //public Dictionary<string,string> Data;
         public bool Resizable = true;
         public Markup()
         {

@@ -18,7 +18,8 @@
         AdminControlsState, 
         UserNotificationState, 
         CatalogState,
-        OwnSizeCreator,
+        ConstantOwnSizesCreator,
+        CustomOwnSizesCreator,
         ExistingSizeSelector
     }
 }

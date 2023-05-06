@@ -15,50 +15,53 @@ namespace BasketStoreTelegramBot.States
         private readonly IState? _returnState;
         private ShoppingBag _shoppingBag;
         private ProductData _currentProductData;
-        private string _colors;
 
         public StateTypes StateType => StateTypes.ColorSelector;
 
         public ColorSelector(IStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
+            _shoppingBag = new ShoppingBag();
         }
         public ColorSelector(IStateMachine stateMachine, IState returnState)
         {
             _stateMachine = stateMachine;
             _returnState = returnState;
+            _shoppingBag = new ShoppingBag();
         }
 
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
-            _currentProductData = ProductDataJsonDeserializer.Instance.
-                                                    CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name);
-            _colors = _currentProductData.Palette;
+            var product = GetProductData(chatID);
             return new PhotoMessage()
             {
                 Caption = "Выберите необходимый цвет",
-                Link = _currentProductData.PalettePhoto,
+                Link = product.PalettePhoto,
             };
         }
 
         public async Task<IMessage> Update(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
+            var productData = GetProductData(chatID);
+            var colors = productData.Palette;
             var text = data.Message.ToLower();
             if (CommandsList.AllCommands.Contains(text))
             {
                 CommandExecutor action = new CommandExecutor(_stateMachine);
                 return await action.DefineCommand(text, data);
             }
-            if (_colors.Contains(text))
+            if (colors.Contains(text))
             {
-                _shoppingBag.CurrentProduct(chatID).Color = text;
+                var product = _shoppingBag.CurrentProduct(chatID);
+                product.Color = text;
+                await _shoppingBag.UpdateInfo(product);
                 IState state;
-                if (_currentProductData.Sizes.Count != 0)
+                if (GetProductData(chatID).Sizes.Count != 0)
                     state = new ChooseSizeType(_stateMachine);
-                else if (_currentProductData.Specifics.Count != 0)
+                else if (productData.Specifics.Count != 0)
                     state = new SpecificsSelection(_stateMachine);
                 else
                     state = new ConstructorEnd(_stateMachine);
@@ -72,6 +75,15 @@ namespace BasketStoreTelegramBot.States
             {
                 Text = "Команда не опознана! Повторите ввод"
             };
+        }
+        private ProductData GetProductData(int chatID)
+        {
+            var product = _shoppingBag.CurrentProduct(chatID);
+            var name = product.Name;
+            var bottom = product.BottomType;
+            if (bottom != null)
+                return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name, bottom);
+            return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name);
         }
     }
 }

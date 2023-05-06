@@ -29,13 +29,12 @@ namespace BasketStoreTelegramBot.Features.States
         {
             _stateMachine = stateMachine;
             _shoppingBag = new ShoppingBag();
-            var dataContext = new DataContext().CatalogProducts;
-            _catalogProductService = new ProductService(dataContext);
+            _catalogProductService = new ProductService();
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
         {
-            var products = (List<ProductEntity>)_catalogProductService.GetAll();
+            var products = (List<ProductEntity>)_catalogProductService.GetAll().Where(x => x.IsCatalogProduct.Value);
             if (products.Count != 0)
                 return new PhotoMessagesCollection()
                 {
@@ -58,7 +57,7 @@ namespace BasketStoreTelegramBot.Features.States
             {
                 if (data.Callback.Message.Text.ToLower() == "добавить в отложенные")
                 {
-                    CatalogProductEntity catalogProduct = _catalogProductService.GetProduct(Convert.ToInt32(data.Callback.Data)).Ti;
+                    ProductEntity catalogProduct = _catalogProductService.GetProduct(Convert.ToInt32(data.Callback.Data));
                     _shoppingBag.AddProductInBag(Convert.ToInt32(data.Id), catalogProduct);
                 }
                 return new TextMessage()
@@ -80,7 +79,7 @@ namespace BasketStoreTelegramBot.Features.States
         private List<PhotoMessage> CreatePhotoMessagesCollection()
         {
             var list = new List<PhotoMessage>();
-            var products = (List<ProductEntity>)_catalogProductService.GetAll();
+            var products = (List<ProductEntity>)_catalogProductService.GetAll().Where(x => x.IsCatalogProduct.Value);
             foreach (var item in products)
             {
                 var keyboard = new Markup

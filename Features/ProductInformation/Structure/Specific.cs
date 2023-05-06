@@ -8,5 +8,6 @@ namespace BasketStoreTelegramBot.Features.ProductInformation.Structure
     {
         [JsonProperty("name")] public string Name { get; private set; }
         [JsonProperty("dependsOfSize")] public SizeDepending sizeDepending { get; private set; }
+        [JsonProperty("cost")] public int Cost { get; private set; }
     }
 }

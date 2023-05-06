@@ -19,14 +19,15 @@ namespace BasketStoreTelegramBot.States
 
         private List<string> DefineButtons(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
             List<string> buttons = new();
-            var product = _shoppingBag.CurrentProduct(Convert.ToInt32(data.Id));
+            var product = GetProductData(chatID);
             buttons.Add("Изменить цвет");
-            if (_currentProductInfo.Resizable.Value)
+            if (product.Resizable.Value)
             {
                 buttons.Add("Изменить размер");
             }
-            if (_currentProductInfo.Specifics != null)
+            if (product.Specifics != null)
             {
                 buttons.Add("Изменить особенности");
             }
@@ -41,11 +42,7 @@ namespace BasketStoreTelegramBot.States
         }
 
         public async Task<IMessage> Initialize(MessageEvent data)
-        {
-            int chatID = Convert.ToInt32(data.Id);
-            _currentProductInfo = ProductDataJsonDeserializer.Instance.
-                                   CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
-                                                        _shoppingBag.CurrentProduct(chatID).BottomType);
+        {            
             var keyboard = new Markup
             {
                 KeyboardWithText = DefineButtons(data)
@@ -83,7 +80,6 @@ namespace BasketStoreTelegramBot.States
                 {
                     state = new ConstructorEnd(_stateMachine);
                 }
-                _shoppingBag.AddProductInBag(chatID);
                 _stateMachine.SetState(data.Id, state);
                 return await state.Initialize(data);
             }
@@ -91,6 +87,14 @@ namespace BasketStoreTelegramBot.States
             {
                 Text = "Команда не опознана!"
             };
+        }
+        private ProductData GetProductData(int chatID)
+        {
+            var name = _shoppingBag.CurrentProduct(chatID).Name;
+            var bottom = _shoppingBag.CurrentProduct(chatID).BottomType;
+            if (bottom != null)
+                return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name, bottom);
+            return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name);
         }
     }
 }

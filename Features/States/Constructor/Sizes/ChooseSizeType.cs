@@ -20,7 +20,6 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
     {
         public StateTypes StateType => StateTypes.ChooseSizeType;
         private ShoppingBag _shoppingBag;
-        private ProductData _currentProductData;
         private readonly IStateMachine _stateMachine;
         private readonly IState _returnState;
         private bool _actionSelected = false;
@@ -43,36 +42,37 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
         public async Task<IMessage> Initialize(MessageEvent data)
         {
             int chatID = Convert.ToInt32(data.Id);
-            _currentProductData = ProductDataJsonDeserializer.Instance.
-                                                   CurrentProductInfo(_shoppingBag.CurrentProduct(chatID).Name,
-                                                                        _shoppingBag.CurrentProduct(chatID).BottomType);
-            if (_currentProductData.Type != null)
+            if (GetProductData(chatID).Type != null)
                 return DefineUserSizeType();
             return await Update(data);
 
         }
         public async Task<IMessage> Update(MessageEvent data)
         {
+            int chatID = Convert.ToInt32(data.Id);
             var text = data.Message.ToLower();
+            var productData = GetProductData(chatID);
             IState state = null;
             if (CommandsList.AllCommands.Contains(text))
             {
                 CommandExecutor action = new CommandExecutor(_stateMachine);
                 return await action.DefineCommand(text, data);
             }
-            if (_currentProductData.Type != null)
+            if (productData.Type != null)
             {
                 if (_sizeTypeActions.Contains(data.Message) && !_actionSelected)
                 {
                     _actionSelected = true;
-                    switch (text)
+                    if(text == "выбрать готовое")
                     {
-                        case "выбрать готовое":
-                            state = new ExistingSizeSelector(_stateMachine, _returnState);
-                            break;
-                        case "создать свое":
-                            state = new OwnSizeCreator(_stateMachine, _returnState);
-                            break;
+                        state = new ExistingSizeSelector(_stateMachine, _returnState);
+                    }
+                    if (text == "создать свое")
+                    {
+                        if (productData.ConstantSizes != null)
+                            state = new ConstantOwnSizesCreator(_stateMachine, _returnState);
+                        else
+                            state = new CustomOwnSizesCreator(_stateMachine, _returnState);
                     }
                 }
                 else
@@ -97,6 +97,15 @@ namespace BasketStoreTelegramBot.Features.States.Constructor.Sizes
                 Text = "Какой размер товара использовать?",
                 ReplyMarkup = keyboard.Insert()
             };
+        }
+        private ProductData GetProductData(int chatID)
+        {
+            var product = _shoppingBag.CurrentProduct(chatID);
+            var name = product.Name;
+            var bottom = product.BottomType;
+            if (bottom != null)
+                return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name, bottom);
+            return ProductDataJsonDeserializer.Instance.CurrentProductInfo(name);
         }
     }
 }

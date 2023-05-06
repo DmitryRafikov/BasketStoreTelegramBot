@@ -9,16 +9,15 @@ using System.Threading.Tasks;
 
 namespace BasketStoreTelegramBot.Models
 {
-    class DataContext : DbContext, IDisposable
+    class DataContext : DbContext
     {
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<ProductEntity> Products { get; set; }
         public DbSet<OrderEntity> Orders { get; set; }
         public DbSet<AdminEntity> Admins { get; set; }
-        public DbSet<ShoppingBagProduct> ShopppingBagProducts { get; set; }
-        public DbSet<CatalogProductEntity> CatalogProducts { get; set; }
+        public DbSet<ShoppingBagProduct> ShoppingBagProducts { get; set; }
         public string DbPath { get; }
-
+        private bool _disposed = false;
         public DataContext()
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
@@ -28,10 +27,8 @@ namespace BasketStoreTelegramBot.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite(@"Data Source=C:\Users\vladu\source\repos\BasketStoreTelegramBot\Data\BasketStoreTelegramDB.db");
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<ShoppingBagProduct>().HasNoKey();
-            
+        ~DataContext() { 
+            Dispose();
         }
     }
 }

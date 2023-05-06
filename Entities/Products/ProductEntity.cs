@@ -2,34 +2,21 @@
 
 namespace BasketStoreTelegramBot.Entities.Products
 {
-    class ProductEntity : IProduct
+    class ProductEntity:ISizeContainer
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Color { get; set; }
-        public string BottomType { get; set; }
+        public string? Color { get; set; }
         public int? Height { get; set; }
         public int? Width { get; set; }
         public int? Length { get; set; }
         public int? Diameter { get; set; }
         public int? AdditionalSize { get; set; }
         public int? Cost { get; set; }
-        public string PhotoLink { get; set; }
-        public string Description { get; set; }
-        public ProductEntity ToProductEntity(CatalogProductEntity catalogProductEntity)
-        {
-            Name = catalogProductEntity.Name;
-            Color = catalogProductEntity.Color;
-            Height = catalogProductEntity.Height;
-            Width = catalogProductEntity.Width;
-            Diameter = catalogProductEntity.Diameter;
-            Length = catalogProductEntity.Length;
-            AdditionalSize = catalogProductEntity.AdditionalSize;
-            Cost = catalogProductEntity.Cost;
-            PhotoLink = catalogProductEntity.PhotoLink;
-            Description = catalogProductEntity.Description;
-            return this;
-        }
+        public string? PhotoLink { get; set; }
+        public string? Description { get; set; }
+        public string? BottomType { get; set; }
+        public bool? IsCatalogProduct { get; set; }
         public override string ToString()
         {
             return $"{Name}\n" +
@@ -46,5 +33,21 @@ namespace BasketStoreTelegramBot.Entities.Products
                    (AdditionalSize != null ? "Дополнительно: " + AdditionalSize.ToString() : string.Empty);
         }
 
+        public ProductEntity Combine(ProductEntity other)
+        {
+            Name = other.Name;
+            Color = other.Color;
+            Height = other.Height;
+            Width = other.Width;
+            Length = other.Length;
+            Diameter = other.Diameter;
+            AdditionalSize = other.AdditionalSize;
+            Cost = other.Cost;
+            PhotoLink = other.PhotoLink;
+            Description = other.Description;
+            BottomType = other.BottomType;
+            IsCatalogProduct = other.IsCatalogProduct;
+            return this;
+        }
     }
 }

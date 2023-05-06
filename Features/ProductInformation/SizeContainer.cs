@@ -18,9 +18,9 @@ namespace BasketStoreTelegramBot.Features.ProductInformation
         {
             get
             {
-                return Height.HasValue &&
-                                     Length.HasValue && Width.HasValue ||
-                                    Height.HasValue && Diameter.HasValue;
+                return Height.HasValue ||
+                                     Length.HasValue || Width.HasValue ||
+                                    Height.HasValue || Diameter.HasValue;
             }
         }
         

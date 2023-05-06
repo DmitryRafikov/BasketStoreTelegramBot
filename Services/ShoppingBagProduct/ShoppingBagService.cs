@@ -16,7 +16,7 @@ namespace BasketStoreTelegramBot.Services.ShoppingBagProduct
         }
         public void Add(UserEntity user, ProductEntity product)
         {
-            _dataContext.ShopppingBagProducts.Add(new Entities.ShoppingBagProduct() { 
+            _dataContext.ShoppingBagProducts.Add(new Entities.ShoppingBagProduct() { 
                 ChatID = user.ID.ToString(),
                 ProductID = product.Id.ToString()
             });
@@ -24,7 +24,7 @@ namespace BasketStoreTelegramBot.Services.ShoppingBagProduct
         }
         public void Add(int chatID, ProductEntity product)
         {
-            _dataContext.ShopppingBagProducts.Add(new Entities.ShoppingBagProduct()
+            _dataContext.ShoppingBagProducts.Add(new Entities.ShoppingBagProduct()
             {
                 ChatID = chatID.ToString(),
                 ProductID = product.Id.ToString()
@@ -33,7 +33,7 @@ namespace BasketStoreTelegramBot.Services.ShoppingBagProduct
         }
         public async Task AddAsync(UserEntity user, ProductEntity product)
         {
-            await _dataContext.ShopppingBagProducts.AddAsync(new Entities.ShoppingBagProduct()
+            await _dataContext.ShoppingBagProducts.AddAsync(new Entities.ShoppingBagProduct()
             {
                 ChatID = user.ID.ToString(),
                 ProductID = product.Id.ToString()
@@ -50,7 +50,7 @@ namespace BasketStoreTelegramBot.Services.ShoppingBagProduct
                     ProductID = product.Id.ToString()
                 });
             }
-            _dataContext.ShopppingBagProducts.AddRange(shoppingBagProducts.ToArray());
+            _dataContext.ShoppingBagProducts.AddRange(shoppingBagProducts.ToArray());
             _dataContext.SaveChanges();
         }
         public async Task AddRangeAsync(UserEntity user, IEnumerable<ProductEntity> products)
@@ -65,37 +65,41 @@ namespace BasketStoreTelegramBot.Services.ShoppingBagProduct
                     ProductID = product.Id.ToString()
                 });
             }
-            await _dataContext.ShopppingBagProducts.AddRangeAsync(shoppingBagProducts.ToArray());
+            await _dataContext.ShoppingBagProducts.AddRangeAsync(shoppingBagProducts.ToArray());
             await _dataContext.SaveChangesAsync();
         }
         public void Remove(Entities.ShoppingBagProduct shoppingBagProduct)
         {
-            _dataContext.ShopppingBagProducts.Remove(shoppingBagProduct);
+            var products = _dataContext.ShoppingBagProducts.ToList();
+            if(products.Contains(shoppingBagProduct))
+                _dataContext.ShoppingBagProducts.Remove(shoppingBagProduct);
             _dataContext.SaveChanges();
         }
         public async Task RemoveAsync(Entities.ShoppingBagProduct shoppingBagProduct)
         {
-            _dataContext.ShopppingBagProducts.Remove(shoppingBagProduct);
+            _dataContext.ShoppingBagProducts.Remove(shoppingBagProduct);
             await _dataContext.SaveChangesAsync();
         }
         public void Update(Entities.ShoppingBagProduct shoppingBagProduct)
         {
-            _dataContext.ShopppingBagProducts.Update(shoppingBagProduct);
+            _dataContext.ShoppingBagProducts.Update(shoppingBagProduct);
             _dataContext.SaveChanges();
         }
         public Entities.ShoppingBagProduct GetLastEntry(int chatID)
         {
-            return _dataContext.ShopppingBagProducts.Last(n => n.ChatID == chatID.ToString());
-           
+            return _dataContext.ShoppingBagProducts.OrderBy(x => x.ID)
+                                                   .ToList()
+                                                   .Last(n => n.ChatID == chatID.ToString());           
         }
         public ProductEntity GetLastProduct(int chatID)
         {
-            var lastData= _dataContext.ShopppingBagProducts.Last(n => n.ChatID == chatID.ToString());
-            return _dataContext.Products.First(n => n.Id == Convert.ToInt32(lastData.ProductID));
+            var id = chatID.ToString();
+            var lastData= _dataContext.ShoppingBagProducts.OrderBy(x=>x.ChatID).ToList().Last(n => n.ChatID == id);
+            return _dataContext.Products.OrderBy(x=>x.Id).ToList().First(n => n.Id == Convert.ToInt32(lastData.ProductID));
         }
         public IEnumerable<Entities.ShoppingBagProduct> GetRange(int chatID)
         {
-            return _dataContext.ShopppingBagProducts.Where(n => n.ChatID == chatID.ToString());
+            return _dataContext.ShoppingBagProducts.Where(n => n.ChatID == chatID.ToString());
         }
     }
 }
